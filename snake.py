@@ -4,12 +4,17 @@ import sys
 import time
 
 
+sw = 1000
+sh = 1000
+
+x_cols = 8
+y_cols = 8
+
+
 class Game:
 	def __init__(self):
 
-		self.sw = 1000
-		self.sh = 1000
-		self.screen = pygame.display.set_mode((self.sw, self.sh))
+		self.screen = pygame.display.set_mode((sw, sh))
 		pygame.init()
 		self.snake = Snake()
 		self.direction = (0, 0)
@@ -60,21 +65,18 @@ class Game:
 class Object:
 
 	def draw(self):
-		x_cols = 8
-		y_cols = 8
-		sw = 1000
-		sh = 1000
+
 		column_spacing = sw / x_cols
 		row_spacing = sh / y_cols
 		pygame.draw.rect(pygame.display.get_surface(), self.color,
-								  (self.x * column_spacing, self.y * row_spacing, column_spacing, row_spacing), 0)
+						(self.x * column_spacing, self.y * row_spacing, column_spacing, row_spacing), 0)
 
 
 class Snake:
 
 	def __init__(self):
 
-		self.snake = [BodyPart((random.randint(0, 7), random.randint(0, 7)))]
+		self.snake = [BodyPart((random.randint(0, x_cols - 1), random.randint(0, y_cols - 1)))]
 		self.direction = (0, 0)
 
 	def move(self):
@@ -94,7 +96,7 @@ class Snake:
 			if (foods[i].x == head.x) and (foods[i].y == head.y):
 				foods.remove(foods[i])
 				self.add_to_tail()
-				foods.append(Food())
+				foods.append(Food(self.snake))
 				break
 
 
@@ -120,13 +122,13 @@ class Snake:
 		return False
 
 	def out_of_bounds(self):
-		if self.snake[-1].x > 7:
+		if self.snake[-1].x > x_cols - 1:
 			return True
 		elif self.snake[-1].x < 0:
 			return True
 		elif self.snake[-1].y < 0:
 			return True
-		elif self.snake[-1].y > 7:
+		elif self.snake[-1].y > y_cols - 1:
 			return True
 		return False
 
@@ -141,10 +143,21 @@ class BodyPart(Object):
 
 class Food(Object):
 
-	def __init__(self):
+	def __init__(self, snake = []):
 
-		self.x = random.randint(0,7)
-		self.y = random.randint(0,7)
+		while True:
+			self.x = random.randint(0, x_cols - 1)
+			self.y = random.randint(0, y_cols - 1)
+
+			overlapping = False
+
+			for bodyPart in snake:
+				if (bodyPart.x == self.x) and (bodyPart.y == self.y):
+					overlapping = True
+
+			if not overlapping:
+				break
+
 
 		self.color = (255, 0, 0)
 
