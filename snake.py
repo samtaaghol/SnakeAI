@@ -10,6 +10,8 @@ sh = 1000
 x_cols = 8
 y_cols = 8
 
+frame_rate = 9
+
 
 class Game:
 	def __init__(self):
@@ -27,9 +29,7 @@ class Game:
 	def run(self):
 
 		while True:
-
 			pygame.display.get_surface().fill((0, 0, 0))
-
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					self.quit()
@@ -42,7 +42,6 @@ class Game:
 						self.snake.direction = (0, -1)
 					elif event.key == pygame.K_DOWN:
 						self.snake.direction = (0, 1)
-
 			self.snake.move()
 			if self.snake.in_self() or self.snake.out_of_bounds():
 				self.quit()
@@ -53,10 +52,11 @@ class Game:
 				food.draw()
 
 			self.update_screen()
-			self.clock.tick(10)
+			self.clock.tick(frame_rate)
 
 	@staticmethod
 	def quit():
+
 		pygame.display.quit()
 		pygame.quit()
 		sys.exit()
@@ -78,8 +78,10 @@ class Snake:
 
 		self.snake = [BodyPart((random.randint(0, x_cols - 1), random.randint(0, y_cols - 1)))]
 		self.direction = (0, 0)
+		self.tail_direction = (0, 0)
 
 	def move(self):
+
 		x = self.snake[-1].x + self.direction[0]
 		y = self.snake[-1].y + self.direction[1]
 		self.snake.append(BodyPart((x, y)))
@@ -99,13 +101,10 @@ class Snake:
 				foods.append(Food(self.snake))
 				break
 
-
-
 	def add_to_tail(self):
 
 		if len(self.snake) != 1:
 			self.tail_direction = (self.snake[1].x - self.snake[0].x, self.snake[1].y - self.snake[0].y)
-
 			x = self.snake[0].x - self.tail_direction[0]
 			y = self.snake[0].y - self.tail_direction[1]
 		else:
@@ -116,12 +115,14 @@ class Snake:
 		self.snake.insert(0, body_part)
 
 	def in_self(self):
+
 		for piece in self.snake[:-1]:
 			if (piece.x == self.snake[-1].x) and (piece.y == self.snake[-1].y):
 				return True
 		return False
 
 	def out_of_bounds(self):
+
 		if self.snake[-1].x > x_cols - 1:
 			return True
 		elif self.snake[-1].x < 0:
